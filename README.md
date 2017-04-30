@@ -4,7 +4,8 @@
 ## CentOS6.5<br>
 <br>
 ## pyenvのインストール<br>
-参考: http://qiita.com/akito1986/items/be5dcd1a502aaf22010b
+参考: http://qiita.com/akito1986/items/be5dcd1a502aaf22010b<br>
+
 ```sh
 yum install gcc bzip2 bzip2-devel openssl openssl-devel readline readline-devel
 cd /usr/local/
@@ -20,8 +21,9 @@ echo 'export PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}"' | sudo tee -a
 source /etc/profile.d/pyenv.sh
 pyenv --version
 ```
-<br>
+
 ## ``Python 3.4.1 :: Anaconda 2.1.0``のインストール
+
 ```sh
 pyenv install -v anaconda3-2.1.0
 pyenv global anaconda3-2.1.0
