@@ -1,0 +1,53 @@
+# coding: utf-8
+import sys, os
+import numpy as np
+sys.path.append(os.pardir) # 親ディレクトリのファイルをインポートするための設定
+from dataset.mnist import load_mnist
+from two_layer_net import TwoLayerNet
+
+(x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)
+
+train_loss_list = []
+train_acc_list = []
+test_acc_list = []
+
+# ハイパーパラメータ
+iters_num = 10000
+train_size = x_train.shape[0]
+batch_size = 100
+learning_rate = 0.1
+
+# 1エポックあたりの繰り返し数
+iter_per_epoch = max(train_size / batch_size, 1)
+
+network = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
+
+print("***** train_neuralnet *****")
+for i in range(iters_num):
+    # ミニバッチの取得
+    batch_mask = np.random.choice(train_size, batch_size)
+    x_batch = x_train[batch_mask]
+    t_batch = t_train[batch_mask]
+
+    # 勾配の計算
+    # grad = network.numerical_gradient(x_batch, t_batch)
+    grad = network.gradient(x_batch, t_batch)
+
+    # パラメータの更新
+    for key in ('W1', 'b1', 'W2', 'b2'):
+        network.params[key] -= learning_rate * grad[key]
+
+    # 学習経過の記録
+    loss = network.loss(x_batch, t_batch)
+    train_loss_list.append(loss)
+    # print(loss)
+
+    # 1エポックごとに認識精度を計算
+    # 学習を行う過程で定期的に訓練データとテストデータを対象に認識精度を記録して、訓練データに対して過学習を起こしていないかを確認する
+    # 本処理を実行した結果、認識精度にほぼ差がないので過学習は起きていない。
+    if i % iter_per_epoch == 0:
+        train_acc = network.accuracy(x_train, t_train)
+        test_acc = network.accuracy(x_test, t_test)
+        train_acc_list.append(train_acc)
+        test_acc_list.append(test_acc)
+        print("train acc, test acc | " + str(train_acc) + ", " + str(test_acc))

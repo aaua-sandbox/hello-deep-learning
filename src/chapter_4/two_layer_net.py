@@ -64,9 +64,37 @@ class TwoLayerNet:
 
         return grads
 
-# 手書き数字認識を行う場合は、入力画像サイズが28x28の計784個あり、出力は10個のクラスになる。隠れ層の個数は適当な値。
-net = TwoLayerNet(input_size=784, hidden_size=100, output_size=10)
-print(net.params['W1'].shape) # (784, 100)
-print(net.params['b1'].shape) # (100, )
-print(net.params['W2'].shape) # (100, 10)
-print(net.params['b2'].shape) # (10, )
+    # numerical_gradientの高速版
+    def gradient(self, x, t):
+        W1, W2 = self.params['W1'], self.params['W2']
+        b1, b2 = self.params['b1'], self.params['b2']
+        grads = {}
+
+        batch_num = x.shape[0]
+
+        # forward
+        a1 = np.dot(x, W1) + b1
+        z1 = sigmoid(a1)
+        a2 = np.dot(z1, W2) + b2
+        y = softmax(a2)
+
+        # backward
+        dy = (y - t) / batch_num
+        grads['W2'] = np.dot(z1.T, dy)
+        grads['b2'] = np.sum(dy, axis=0)
+
+        da1 = np.dot(dy, W2.T)
+        dz1 = sigmoid_grad(a1) * da1
+        grads['W1'] = np.dot(x.T, dz1)
+        grads['b1'] = np.sum(dz1, axis=0)
+
+        return grads
+
+
+# # 手書き数字認識を行う場合は、入力画像サイズが28x28の計784個あり、出力は10個のクラスになる。隠れ層の個数は適当な値。
+# net = TwoLayerNet(input_size=784, hidden_size=100, output_size=10)
+# print("***** TwoLayerNet *****")
+# print(net.params['W1'].shape) # (784, 100)
+# print(net.params['b1'].shape) # (100, )
+# print(net.params['W2'].shape) # (100, 10)
+# print(net.params['b2'].shape) # (10, )
